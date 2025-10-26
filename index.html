@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BoyMade Streetwear</title>
+<link rel="icon" href="assets/icon.png">
+<style>
+:root{--bg:#000;--card:#111;--muted:#9aa0a6;--accent:#00b894;--white:#fff}
+html,body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--white)}
+.container{max-width:1100px;margin:0 auto;padding:16px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.brand{font-weight:800;font-size:20px}
+.tag{font-size:12px;color:var(--muted);margin-left:8px}
+.btn{background:var(--white);color:#000;padding:8px 12px;border-radius:6px;text-decoration:none;display:inline-block}
+.topbar{display:flex;gap:8px;align-items:center}
+.hero{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:16px 0}
+.hero .left{flex:1;min-width:240px}
+.hero .right{flex:1;min-width:240px}
+.card{background:var(--card);border-radius:10px;padding:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.product img{width:100%;height:180px;object-fit:cover;border-radius:8px}
+.p-title{font-weight:600;margin-top:8px}
+.p-price{color:var(--accent);margin-top:6px;font-weight:700}
+.small{font-size:13px;color:var(--muted)}
+
+/* cart drawer */
+.cart-drawer{position:fixed;right:12px;top:80px;width:320px;max-width:90vw;background:var(--card);padding:12px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.6);display:none;z-index:50}
+.cart-item{display:flex;gap:8px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.03);padding:8px 0}
+.qtybtn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:4px 8px;border-radius:6px;color:var(--white)}
+
+/* responsive */
+@media(max-width:700px){
+  .hero{flex-direction:column}
+  .cart-drawer{right:8px;top:70px}
+}
+.footer{margin-top:24px;color:var(--muted);font-size:13px;text-align:center;padding:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div>
+      <span class="brand">BoyMade Streetwear</span>
+      <span class="tag">Made for the real ones</span>
+    </div>
+    <div class="topbar">
+      <a class="btn" href="#" id="whatsappBtn">Order on WhatsApp</a>
+      <a class="btn" href="#" id="openCart">Cart (<span id="cartCount">0</span>)</a>
+      <a class="btn" href="admin.html" target="_blank">Admin</a>
+    </div>
+  </header>
+
+  <section class="hero card">
+    <div class="left">
+      <h1 style="margin:0">Street Style • BoyMade Streetwear</h1>
+      <p class="small">Trendy T-Shirts, Hoodies, Jeans & Shoes. Shop online or order via WhatsApp.</p>
+      <div style="margin-top:12px">
+        <a href="#products" class="btn">Shop Now</a>
+      </div>
+    </div>
+    <div class="right">
+      <img src="assets/hero.jpg" alt="hero" style="width:100%;border-radius:8px;height:180px;object-fit:cover" />
+    </div>
+  </section>
+
+  <section id="products" style="margin-top:16px">
+    <h2 style="margin:8px 0">Products</h2>
+    <div class="grid" id="productGrid"></div>
+  </section>
+
+  <div class="cart-drawer" id="cartDrawer">
+    <h3>Cart</h3>
+    <div id="cartItems"></div>
+    <div style="margin-top:8px">
+      <div class="small">Total: ₹<span id="cartTotal">0</span></div>
+      <div style="margin-top:8px">
+        <button class="btn" id="checkoutBtn">Proceed to Checkout</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="checkoutModal" style="display:none;margin-top:16px">
+    <div class="card">
+      <h3>Checkout</h3>
+      <div style="display:grid;gap:8px">
+        <input id="name" placeholder="Full name" style="padding:8px;border-radius:6px;background:#0b0b0b;border:1px solid rgba(255,255,255,0.06);color:var(--white)"/>
+        <input id="phone" placeholder="Phone" style="padding:8px;border-radius:6px;background:#0b0b0b;border:1px solid rgba(255,255,255,0.06);color:var(--white)"/>
+        <textarea id="address" placeholder="Delivery address" style="padding:8px;border-radius:6px;background:#0b0b0b;border:1px solid rgba(255,255,255,0.06);color:var(--white)"></textarea>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <label><input type="radio" name="pay" value="half" checked> Half now (pay 50%) + Half on delivery</label>
+          <label><input type="radio" name="pay" value="online"> Full online payment</label>
+          <label><input type="radio" name="pay" value="cod"> COD (Full on delivery)</label>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="placeOrderBtn">Place Order</button>
+          <a class="btn" id="whatsappCheckout" href="#" target="_blank">Order via WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">© BoyMade Streetwear — Manthani • Contact: 7337450599 • Order on WhatsApp</footer>
+</div>
+
+<script>
+const WA = 'https://wa.me/917337450599';
+document.getElementById('whatsappBtn').href = WA;
+document.getElementById('whatsappCheckout').href = WA;
+
+const products = [
+  {id:1,title:'Graphic Tee - Black',price:499,stock:20,img:'assets/p1.jpg'},
+  {id:2,title:'Oversized Hoodie',price:999,stock:15,img:'assets/p2.jpg'},
+  {id:3,title:'Slim Jeans',price:1199,stock:10,img:'assets/p3.jpg'},
+  {id:4,title:'Street Runner Shoes',price:1499,stock:8,img:'assets/p4.jpg'}
+];
+
+const productGrid = document.getElementById('productGrid');
+const cartDrawer = document.getElementById('cartDrawer');
+const cartCount = document.getElementById('cartCount');
+const cartItemsEl = document.getElementById('cartItems');
+const cartTotalEl = document.getElementById('cartTotal');
+const openCartBtn = document.getElementById('openCart');
+const checkoutBtn = document.getElementById('checkoutBtn');
+const checkoutModal = document.getElementById('checkoutModal');
+const placeOrderBtn = document.getElementById('placeOrderBtn');
+
+let cart = JSON.parse(localStorage.getItem('bm_cart')||'[]');
+renderProducts();
+updateCartUI();
+
+openCartBtn.addEventListener('click', ()=>{cartDrawer.style.display = cartDrawer.style.display==='none'?'block':'none';});
+function renderProducts(){
+  productGrid.innerHTML = '';
+  products.forEach(p=>{
+    const el = document.createElement('div');
+    el.className = 'card product';
+    el.innerHTML = `
+      <img src="${p.img}" alt="${p.title}" />
+      <div class="p-title">${p.title}</div>
+      <div class="small">Stock: ${p.stock}</div>
+      <div class="p-price">₹${p.price}</div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn add" data-id="${p.id}">Add to Cart</button>
+        <a class="btn" href="${WA}?text=I%20want%20to%20order%20${encodeURIComponent(p.title)}%20from%20BoyMade%20Streetwear" target="_blank">Order via WhatsApp</a>
+      </div>
+    `;
+    productGrid.appendChild(el);
+  });
+  document.querySelectorAll('.add').forEach(b=>b.addEventListener('click',()=>{
+    const id = Number(b.dataset.id);
+    addToCart(id);
+  }));
+}
+
+function addToCart(id){
+  const p = products.find(x=>x.id===id);
+  const found = cart.find(i=>i.id===id);
+  if(found){ found.qty++; }
+  else cart.push({...p, qty:1});
+  localStorage.setItem('bm_cart', JSON.stringify(cart));
+  updateCartUI();
+}
+
+function updateCartUI(){
+  cartCount.innerText = cart.reduce((s,i)=>s+i.qty,0);
+  cartItemsEl.innerHTML = '';
+  let total = 0;
+  cart.forEach(item=>{
+    total += item.price*item.qty;
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <img src="${item.img}" style="width:56px;height:56px;object-fit:cover;border-radius:6px"/>
+      <div style="flex:1">
+        <div>${item.title}</div>
+        <div class="small">₹${item.price} x ${item.qty}</div>
+        <div style="margin-top:6px"><button class="qtybtn" data-id="${item.id}" data-action="-">-</button> <button class="qtybtn" data-id="${item.id}" data-action="+">+</button></div>
+      </div>
+    `;
+    cartItemsEl.appendChild(div);
+  });
+  cartTotalEl.innerText = total;
+  document.querySelectorAll('.qtybtn').forEach(b=>b.addEventListener('click',()=>{
+    const id=Number(b.dataset.id), act=b.dataset.action;
+    cart = cart.map(i=> i.id===id? {...i, qty: Math.max(1, i.qty + (act==='+'?1:-1))} : i );
+    localStorage.setItem('bm_cart', JSON.stringify(cart));
+    updateCartUI();
+  }));
+}
+
+checkoutBtn.addEventListener('click', ()=>{
+  if(cart.length===0){ alert('Cart empty'); return; }
+  cartDrawer.style.display='none'; checkoutModal.style.display='block';
+});
+
+placeOrderBtn.addEventListener('click', ()=>{
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+  const pay = document.querySelector('input[name="pay"]:checked').value;
+  if(!name||!phone||!address){ alert('Please fill details'); return; }
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const paidNow = pay==='online' ? total : (pay==='half' ? Math.ceil(total/2):0);
+  const order = { id: 'ORD'+Date.now(), items: cart, total, name, phone, address, paymentMethod:pay, paidNow, status: pay==='online'?'Paid':'Half Paid', createdAt: new Date().toISOString() };
+  // save order to localStorage (admin can view)
+  const orders = JSON.parse(localStorage.getItem('bm_orders')||'[]');
+  orders.push(order); localStorage.setItem('bm_orders', JSON.stringify(orders));
+  // clear cart
+  cart = []; localStorage.setItem('bm_cart', JSON.stringify(cart)); updateCartUI();
+  checkoutModal.style.display='none';
+  alert('Order placed! We will contact you. Use Admin page to view orders.');
+});
+
+</script>
+</body>
+</html>
